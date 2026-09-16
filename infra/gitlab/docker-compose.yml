@@ -1,0 +1,31 @@
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:${GITLAB_VERSION}
+    container_name: gitlab
+    restart: unless-stopped
+    hostname: gitlab.${BASE_DOMAIN}
+    shm_size: "256m"
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://gitlab.${BASE_DOMAIN}'
+        gitlab_rails['gitlab_shell_ssh_port'] = ${GITLAB_SSH_PORT}
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+    ports:
+      - "${GITLAB_SSH_PORT}:22"
+    volumes:
+      - ./data/config:/etc/gitlab
+      - ./data/logs:/var/log/gitlab
+      - ./data/data:/var/opt/gitlab
+    networks:
+      - edge
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gitlab.rule=Host(`gitlab.${BASE_DOMAIN}`)
+      - traefik.http.routers.gitlab.entrypoints=web
+      - traefik.http.services.gitlab.loadbalancer.server.port=80
+
+networks:
+  edge:
+    name: ${EDGE_NETWORK}
+    external: true

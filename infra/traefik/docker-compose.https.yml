@@ -1,0 +1,24 @@
+# Override para activar HTTPS con Let's Encrypt cuando tengas un dominio
+# real apuntando a este servidor (ver docs/02-gitlab-ce.md). Úsalo así:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.https.yml up -d
+#
+# Redeclara `command` completo (Compose reemplaza esa lista en vez de
+# combinarla); `ports` y `volumes` sí se combinan con los del archivo base.
+services:
+  traefik:
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=${EDGE_NETWORK}
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}
+      - --certificatesresolvers.letsencrypt.acme.storage=/acme.json
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
+    ports:
+      - "443:443"
+    volumes:
+      - ./data/acme.json:/acme.json

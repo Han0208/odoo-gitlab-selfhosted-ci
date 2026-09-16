@@ -39,9 +39,10 @@ propio servidor sin tocar el código del pipeline.
 
 ## Roadmap
 
-- [ ] Provisionar el servidor (Docker, firewall) — ver
+- [x] Provisionar el servidor (Docker, firewall) — ver
       [docs/01-provision-server.md](./docs/01-provision-server.md)
-- [ ] Levantar GitLab CE
+- [ ] Levantar GitLab CE — ver [docs/02-gitlab-ce.md](./docs/02-gitlab-ce.md)
+      (incluye montar Traefik como ingress desde este paso)
 - [ ] Registrar Runner(s)
 - [ ] Imagen base de Odoo + docker-compose (Odoo + Postgres)
 - [ ] Pipeline: build + test
