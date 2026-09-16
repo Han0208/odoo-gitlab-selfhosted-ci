@@ -28,11 +28,12 @@ GitLab ni nada de Odoo — eso viene en los pasos siguientes.
    Este `.env` de la raíz solo trae variables de alcance servidor, las que
    usan los scripts en `/scripts` antes de que exista ningún stack de
    Docker Compose: `GITLAB_SSH_PORT` (puerto que usará más adelante el
-   contenedor de GitLab para git clone/push por SSH) y `EDGE_NETWORK`
-   (nombre de la red Docker compartida que crearás en el siguiente paso).
-   Los defaults funcionan para la mayoría de los casos — solo cambia
-   `GITLAB_SSH_PORT` si ya tienes algo escuchando en ese puerto. Cada stack
-   (Traefik, GitLab, ...) trae además su propio `.env.example` junto a su
+   contenedor de GitLab para git clone/push por SSH), `EDGE_NETWORK`
+   (nombre de la red Docker compartida que crearás en el siguiente paso) y
+   `DOCKER_VERSION` (versión de Docker Engine a instalar). Los defaults
+   funcionan para la mayoría de los casos — solo cambia `GITLAB_SSH_PORT`
+   si ya tienes algo escuchando en ese puerto. Cada stack (Traefik,
+   GitLab, ...) trae además su propio `.env.example` junto a su
    `docker-compose.yml`, con la configuración que le es propia.
 
 3. Ejecuta el script de provisioning:
@@ -74,6 +75,14 @@ GitLab ni nada de Odoo — eso viene en los pasos siguientes.
   contenedor de GitLab) escuchando en el mismo host.
 - **Todo parametrizado por `.env`**: quien reutilice este repo en su propio
   servidor solo edita `.env`, nunca el script.
+- **Docker Engine con versión fijada (`DOCKER_VERSION`), no "la última"**:
+  el repositorio oficial de Docker instala por defecto lo más nuevo
+  disponible. En la práctica, una versión de Docker recién salida subió la
+  versión mínima de su API por encima de lo que soporta Traefik (y
+  probablemente otras herramientas del ecosistema que todavía no se han
+  puesto al día), rompiendo el auto-discovery en silencio — Traefik
+  arrancaba, pero nunca veía los contenedores. Fijar una versión conocida
+  evita reproducir ese problema en cada servidor nuevo.
 
 ## Siguiente paso
 

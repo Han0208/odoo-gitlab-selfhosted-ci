@@ -22,9 +22,10 @@ source "${ENV_FILE}"
 set +a
 
 GITLAB_SSH_PORT="${GITLAB_SSH_PORT:-2222}"
+DOCKER_VERSION="${DOCKER_VERSION:-28.5.2}"
 TARGET_USER="${SUDO_USER:-$(logname)}"
 
-echo "==> Instalando Docker Engine + Compose plugin"
+echo "==> Instalando Docker Engine + Compose plugin (v${DOCKER_VERSION})"
 apt-get update -y
 apt-get install -y ca-certificates curl gnupg
 
@@ -38,7 +39,20 @@ deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] h
 EOF
 
 apt-get update -y
-apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Se fija la versión exacta del paquete (no "la última") para evitar
+# incompatibilidades como la de Docker 29, que subió la versión mínima de
+# su API y rompió el auto-discovery de Traefik.
+DOCKER_PKG_VERSION="$(apt-cache madison docker-ce | awk -v v="${DOCKER_VERSION}" '$3 ~ ("^5:" v "-") {print $3; exit}')"
+if [[ -z "${DOCKER_PKG_VERSION}" ]]; then
+    echo "No se encontró un paquete docker-ce para la versión ${DOCKER_VERSION}." >&2
+    exit 1
+fi
+
+apt-get install -y --allow-downgrades \
+    docker-ce="${DOCKER_PKG_VERSION}" \
+    docker-ce-cli="${DOCKER_PKG_VERSION}" \
+    containerd.io docker-buildx-plugin docker-compose-plugin
 
 systemctl enable --now docker
 
