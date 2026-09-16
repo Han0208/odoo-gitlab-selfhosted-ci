@@ -37,6 +37,15 @@ propio servidor sin tocar el código del pipeline.
 
 🚧 En construcción — documentado paso a paso a medida que se avanza.
 
+**Dónde quedamos (2026-09-16):** pasos 1 y 2 del roadmap completados y
+verificados en un servidor de pruebas (VM `odoo-ci`, Ubuntu 24.04,
+`192.168.122.238`). GitLab CE está arriba, detrás de Traefik, accesible en
+`http://gitlab.192.168.122.238.nip.io`, con un usuario personal (`hanzel`)
+ya creado además de `root`. Detalle completo de lo hecho, decisiones e
+incidentes resueltos en `docs/01-provision-server.md` y
+`docs/02-gitlab-ce.md`. **Siguiente paso:** registrar el/los Runner(s)
+(executor Docker) — punto 3 del roadmap, aún sin `docs/03-gitlab-runner.md`.
+
 ## Roadmap
 
 - [x] Provisionar el servidor (Docker, firewall) — ver
