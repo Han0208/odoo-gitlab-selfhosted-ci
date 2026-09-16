@@ -25,10 +25,15 @@ GitLab ni nada de Odoo — eso viene en los pasos siguientes.
    cp .env.example .env
    ```
 
-   Por ahora la única variable relevante es `GITLAB_SSH_PORT` (puerto que
-   usará más adelante el contenedor de GitLab para git clone/push por SSH).
-   El valor por defecto, `2222`, funciona para la mayoría de los casos —
-   solo cámbialo si ya tienes algo escuchando en ese puerto.
+   Este `.env` de la raíz solo trae variables de alcance servidor, las que
+   usan los scripts en `/scripts` antes de que exista ningún stack de
+   Docker Compose: `GITLAB_SSH_PORT` (puerto que usará más adelante el
+   contenedor de GitLab para git clone/push por SSH) y `EDGE_NETWORK`
+   (nombre de la red Docker compartida que crearás en el siguiente paso).
+   Los defaults funcionan para la mayoría de los casos — solo cambia
+   `GITLAB_SSH_PORT` si ya tienes algo escuchando en ese puerto. Cada stack
+   (Traefik, GitLab, ...) trae además su propio `.env.example` junto a su
+   `docker-compose.yml`, con la configuración que le es propia.
 
 3. Ejecuta el script de provisioning:
 

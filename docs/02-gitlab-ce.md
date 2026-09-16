@@ -15,16 +15,20 @@ se enrutan por Traefik.
 
 ## Configuración
 
-Edita tu `.env` (no `.env.example`) y completa:
+Cada stack tiene su propio `.env`, copiado de su `.env.example`:
 
-- `BASE_DOMAIN`: si no tienes dominio propio todavía, usa el truco de
+- `.env` (raíz del repo): ya lo configuraste en el paso 1
+  (`GITLAB_SSH_PORT`, `EDGE_NETWORK`).
+- `infra/traefik/.env`: copia `infra/traefik/.env.example`. Los defaults de
+  `TRAEFIK_VERSION` y `EDGE_NETWORK` sirven tal cual — solo asegúrate de que
+  `EDGE_NETWORK` sea igual al del `.env` raíz. `ACME_EMAIL` no aplica
+  todavía (es para cuando actives HTTPS con un dominio real, ver más abajo).
+- `infra/gitlab/.env`: copia `infra/gitlab/.env.example`. Ajusta
+  `BASE_DOMAIN` — si no tienes dominio propio todavía, usa el truco de
   [nip.io](https://nip.io): `<IP-de-tu-servidor>.nip.io` resuelve
   públicamente a esa IP sin configurar DNS. Ejemplo: si tu servidor está en
-  `192.168.1.50`, pon `BASE_DOMAIN=192.168.1.50.nip.io`.
-- El resto de variables (`EDGE_NETWORK`, `TRAEFIK_VERSION`, `GITLAB_VERSION`,
-  `GITLAB_SSH_PORT`) ya tienen defaults razonables — solo revísalas.
-- `ACME_EMAIL` no aplica todavía (es para cuando actives HTTPS con un
-  dominio real, ver más abajo).
+  `192.168.1.50`, pon `BASE_DOMAIN=192.168.1.50.nip.io`. `GITLAB_SSH_PORT` y
+  `EDGE_NETWORK` deben quedar iguales a los del `.env` raíz.
 
 ## Pasos
 
@@ -38,6 +42,7 @@ Edita tu `.env` (no `.env.example`) y completa:
 
    ```bash
    cd infra/traefik
+   cp .env.example .env   # y ajusta lo que corresponda
    docker compose up -d
    ```
 
@@ -46,6 +51,7 @@ Edita tu `.env` (no `.env.example`) y completa:
 
    ```bash
    cd ../gitlab
+   cp .env.example .env   # y ajusta BASE_DOMAIN
    docker compose up -d
    docker compose logs -f gitlab
    ```
@@ -67,7 +73,7 @@ Edita tu `.env` (no `.env.example`) y completa:
 ## Cuando tengas un dominio real (activar HTTPS)
 
 1. Apunta el DNS de tu dominio al servidor y actualiza `BASE_DOMAIN` en
-   `.env` con ese dominio real.
+   `infra/gitlab/.env` con ese dominio real.
 2. Crea el archivo donde Traefik guarda los certificados, con permisos
    `600` (Let's Encrypt lo exige):
 
@@ -107,6 +113,16 @@ Edita tu `.env` (no `.env.example`) y completa:
   de Docker**: los datos de cada servicio quedan visibles como carpetas
   normales dentro del repo (ignoradas por git), lo que simplifica el script
   de backups del paso 7.
+- **Un `.env` por stack, en vez de uno solo en la raíz**: `docker compose`
+  busca el `.env` junto al `docker-compose.yml` por defecto — con un único
+  `.env` en la raíz, cada comando habría necesitado `--env-file ../../.env`
+  (fácil de olvidar, y el error resultante — "variable no está definida" —
+  no es obvio). Cada stack trae solo las variables que usa; las que de
+  verdad son compartidas (`EDGE_NETWORK`, y `GITLAB_SSH_PORT` para el
+  firewall) también viven en el `.env` raíz porque los scripts de
+  `/scripts` corren antes de que exista ningún stack, y deben coincidir en
+  ambos lados — está documentado en los comentarios de cada
+  `.env.example`.
 
 ## Siguiente paso
 
