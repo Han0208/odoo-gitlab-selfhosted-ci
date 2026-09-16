@@ -1,0 +1,7 @@
+# Variables de entorno reales — usar .env.example como plantilla
+.env
+.env.*
+!.env.example
+
+# Datos persistentes generados en runtime por los contenedores
+/infra/**/data/
