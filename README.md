@@ -18,7 +18,12 @@ Servir de guía paso a paso, reproducible, para montar en un servidor privado
 un flujo completo:
 
 > push a una rama → build de la imagen Odoo → tests → deploy automático de
-> un ambiente Odoo aislado por rama → cleanup al cerrar la rama/MR
+> un ambiente Odoo aislado por rama (para pruebas/desarrollo) → cleanup al
+> cerrar la rama/MR
+>
+> El despliegue a producción queda **fuera del alcance** de esta plantilla:
+> producción vive en un servidor separado, con su propio proceso
+> independiente que toma la rama `main` de este mismo GitLab.
 
 La configuración (dominios, credenciales, versión de Odoo) vive en variables
 de entorno / archivos `.env.example`, para que cada quien lo adapte a su
@@ -53,9 +58,10 @@ incidentes resueltos en `docs/01-provision-server.md` y
 - [x] Levantar GitLab CE — ver [docs/02-gitlab-ce.md](./docs/02-gitlab-ce.md)
       (incluye montar Traefik como ingress desde este paso)
 - [ ] Registrar Runner(s)
-- [ ] Imagen base de Odoo + docker-compose (Odoo + Postgres)
+- [ ] Imagen base de Odoo + docker-compose (Odoo + Postgres) — diseño:
+      [docs/design-deploy-testing.md](./docs/design-deploy-testing.md)
 - [ ] Pipeline: build + test
-- [ ] Deploy dinámico por rama con Traefik
+- [ ] Deploy dinámico de ambientes de prueba por rama con Traefik
 - [ ] Backups y persistencia de datos
 - [ ] Cleanup automático de ambientes efímeros
 - [ ] Configuración por `.env` (sin datos hardcodeados) para que cualquiera
